@@ -37,7 +37,7 @@ PUD_OFF = 20
 PUD_DOWN = 21
 PUD_UP = 22
 
-VERSION = "DoerGPIO.GPIO 0.4"
+VERSION = "DoerGPIO.GPIO 1.0"
 
 # OS INTERFACE =========================================================
 

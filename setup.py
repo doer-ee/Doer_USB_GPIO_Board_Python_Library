@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="DoerGPIO",
-    version="0.4",  # Incremented version number
+    version="1.0",  # Incremented version number
     packages=find_packages(),
     install_requires=[
         "pyserial",  # Required for serial communication
