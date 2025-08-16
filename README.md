@@ -1,0 +1,299 @@
+# Doer USB GPIO Board
+
+**Doer USB GPIO** board is a hardware device that brings general-purpose input/output (GPIO) capabilities to your PC, Mac, or Linux computer via USB. It acts as a bridge, allowing your computer to interact with sensors, actuators, and other electronic components—just like you would with a Raspberry Pi's GPIO pins. The pinout is the same as the Raspberry Pi, so if you're familiar with Raspberry Pi GPIO, using the Doer USB GPIO will feel very similar. With the Doer USB GPIO, you can easily add hardware extension and automation features to your desktop or laptop, making it possible to prototype, control, and monitor electronics directly from your computer using familiar Python code.
+
+This is a Python library for controlling Doer USB GPIO boards. This library provides a simple and intuitive interface for GPIO operations, PWM control, and ADC readings on Doer hardware.
+
+## Features
+
+- **GPIO Control**: Digital input/output operations with configurable pull-up/pull-down resistors
+- **PWM Support**: Pulse Width Modulation on compatible pins (4, 9, 10, 16, 18, 20, 22, 26)
+- **ADC Readings**: Analog-to-Digital conversion on supported pins (0, 9, 10, 11, 14, 15, 18, 26)
+- **Automatic Device Detection**: Automatically detects Doer GPIO boards (USB VID:PID 1a86:7523)
+- **Hardware/Software Version Verification**: Validates board compatibility
+- **Raspberry Pi Compatible API**: Familiar GPIO interface similar to RPi.GPIO
+
+## Hardware Requirements
+
+- Doer USB GPIO Board available at https://doer.ee
+- USB connection to host computer
+
+## Installation
+
+```bash
+pip install DoerGPIO
+```
+
+## Quick Start
+
+```python
+from DoerGPIO import GPIO
+
+# Basic GPIO setup and control
+GPIO.setup(18, GPIO.OUT)
+GPIO.output(18, GPIO.HIGH)
+GPIO.output(18, GPIO.LOW)
+
+# Reading digital input with pull-up resistor
+GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+value = GPIO.input(16)
+print(f"Pin 16 value: {value}")
+
+# PWM example: fade an LED on pin 22
+GPIO.setup(22, GPIO.PWM)
+GPIO.pwm_set_duty(22, 0.5) #50% Duty cycle
+GPIO.pwm_set_frequency(22, 1000) # 1K Frequency
+
+# Reading analog value from ADC pin
+GPIO.setup(26, GPIO.ADC)
+adc_value = GPIO.input(26)
+print(f"ADC value on pin 26: {adc_value}")
+
+# Cleanup when done
+GPIO.cleanup()
+```
+
+## API Reference
+
+### Constants
+
+```python
+# Pin modes
+GPIO.IN      # Input mode
+GPIO.OUT     # Output mode  
+GPIO.PWM     # PWM mode
+GPIO.ADC     # ADC mode
+
+# Logic levels
+GPIO.HIGH    # Logic high (1)
+GPIO.LOW     # Logic low (0)
+
+# Pull-up/Pull-down resistors
+GPIO.PUD_UP    # Pull-up resistor
+GPIO.PUD_DOWN  # Pull-down resistor
+GPIO.PUD_OFF   # No pull resistor
+```
+
+### Core Functions
+
+#### `GPIO.setup(channel, mode, pull_up_down=None, initial=0)`
+Configure a GPIO pin.
+
+**Parameters:**
+- `channel` (int): Pin number (0-27)
+- `mode` (int): Pin mode (IN, OUT, PWM, or ADC)
+- `pull_up_down` (int, optional): Pull resistor configuration (for input pins)
+- `initial` (int, optional): Initial value for output pins (default: 0)
+
+**Examples:**
+```python
+# Output pin with initial low state
+GPIO.setup(18, GPIO.OUT, initial=GPIO.LOW)
+
+# Input pin with pull-up resistor
+GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# PWM pin (only on supported pins)
+GPIO.setup(20, GPIO.PWM)
+
+# ADC pin (only on supported pins)
+GPIO.setup(26, GPIO.ADC)
+```
+
+#### `GPIO.output(channel, value)`
+Set the output value of a GPIO pin.
+
+**Parameters:**
+- `channel` (int): Pin number
+- `value` (int/bool): Output value (HIGH/LOW, 1/0, True/False)
+
+```python
+GPIO.output(18, GPIO.HIGH)
+GPIO.output(18, 1)
+GPIO.output(18, True)  # All equivalent
+```
+
+#### `GPIO.input(channel)`
+Read the current value of a GPIO pin.
+
+**Parameters:**
+- `channel` (int): Pin number
+
+**Returns:**
+- `int`: Current pin value (0 or 1)
+
+```python
+value = GPIO.input(16)
+if value:
+    print("Pin is HIGH")
+else:
+    print("Pin is LOW")
+```
+
+### PWM Functions
+
+#### `GPIO.pwm_set_duty(channel, duty)`
+Set PWM duty cycle.
+
+**Parameters:**
+- `channel` (int): PWM pin number (4, 9, 10, 16, 18, 20, 22, 26)
+- `duty` (int): Duty cycle value
+
+```python
+GPIO.setup(20, GPIO.PWM)
+GPIO.pwm_set_duty(20, 128)  # 50% duty cycle
+```
+
+#### `GPIO.pwm_set_frequency(channel, frequency)`
+Set PWM frequency.
+
+**Parameters:**
+- `channel` (int): PWM pin number
+- `frequency` (int): Frequency in Hz
+
+```python
+GPIO.pwm_set_frequency(20, 1000)  # 1kHz
+```
+
+### ADC Functions
+
+#### `GPIO.adc_read(channel)`
+Read analog value from ADC pin.
+
+**Parameters:**
+- `channel` (int): ADC pin number (0, 9, 10, 11, 14, 15, 18, 26)
+
+**Returns:**
+- `int`: ADC reading (0-4095 for 12-bit ADC)
+
+```python
+GPIO.setup(26, GPIO.ADC)
+analog_value = GPIO.adc_read(26)
+voltage = (analog_value / 4095.0) * 3.3  # Convert to voltage
+```
+
+### Utility Functions
+
+#### `GPIO.cleanup()`
+Clean up GPIO resources.
+
+```python
+GPIO.cleanup()
+```
+
+## Pin Capabilities
+
+### All Pins (0-27)
+- Digital input/output
+
+### PWM Capable Pins
+- 4, 9, 10, 16, 18, 20, 22, 26
+
+### ADC Capable Pins  
+- 0, 9, 10, 11, 14, 15, 18, 26
+
+## Complete Example
+
+```python
+from DoerGPIO import GPIO
+import time
+
+# LED control
+led_pin = 18
+GPIO.setup(led_pin, GPIO.OUT)
+
+# Button with pull-up
+button_pin = 16  
+GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# PWM for servo/motor control
+pwm_pin = 20
+GPIO.setup(pwm_pin, GPIO.PWM)
+GPIO.pwm_set_frequency(pwm_pin, 50)  # 50Hz for servo
+
+# ADC for sensor reading
+sensor_pin = 26
+GPIO.setup(sensor_pin, GPIO.ADC)
+
+try:
+    while True:
+        # Read button (active low due to pull-up)
+        if not GPIO.input(button_pin):
+            GPIO.output(led_pin, GPIO.HIGH)
+            print("Button pressed!")
+        else:
+            GPIO.output(led_pin, GPIO.LOW)
+        
+        # Read sensor
+        sensor_value = GPIO.adc_read(sensor_pin)
+        print(f"Sensor reading: {sensor_value}")
+        
+        # PWM sweep
+        for duty in range(0, 255, 5):
+            GPIO.pwm_set_duty(pwm_pin, duty)
+            time.sleep(0.02)
+            
+        time.sleep(0.1)
+        
+except KeyboardInterrupt:
+    print("Exiting...")
+finally:
+    GPIO.cleanup()
+```
+
+## Troubleshooting
+
+### Device Not Found
+If you get "Doer GPIO board is not detected":
+1. Check USB connection
+2. Verify the board is powered
+3. Ensure drivers are installed
+4. Check that no other software is using the serial port
+
+### Connection Issues
+- The library automatically retries connection on startup
+- Press Enter to retry or 'q' to quit when prompted
+- Ensure the board firmware is compatible
+
+### Permission Issues (Linux/macOS)
+```bash
+# Add user to dialout group (Linux)
+sudo usermod -a -G dialout $USER
+
+# Or run with sudo (not recommended for regular use)
+sudo python your_script.py
+```
+
+## Technical Details
+
+- **Communication**: Serial over USB (230400 baud)
+- **Protocol**: Custom ASCII protocol with 'Z' terminators
+- **Device ID**: USB VID:PID 1a86:7523
+- **Python Support**: 3.9+
+- **Dependencies**: pyserial
+
+## Acknowledgments
+
+This project was inspired by and builds upon the excellent work of the **RTK GPIO** project by Ryanteck LTD. We extend our sincere gratitude to the RTK GPIO team for their pioneering work in USB GPIO interfaces and their open-source contributions to the maker community.
+
+While DoerGPIO draws initial inspiration from RTK GPIO concepts, it has undergone extensive further development and modifications, including:
+
+- Complete hardware redesign optimized for the Doer USB GPIO board
+- Enhanced communication protocol with improved reliability
+- Expanded PWM and ADC functionality with more supported pins
+- Comprehensive error handling and device detection
+- Extended documentation and examples
+
+We believe in the power of open-source collaboration and are proud to contribute back to the community while acknowledging those who came before us.
+
+## Support
+
+For technical support and hardware information, visit: https://doer.ee
+
+## License
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
