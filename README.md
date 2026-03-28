@@ -172,6 +172,28 @@ analog_value = GPIO.adc_read(26)
 voltage = (analog_value / 4095.0) * 3.3  # Convert to voltage
 ```
 
+### I2C Functions
+
+The library exposes bus-level I2C helpers:
+
+- `GPIO.i2c_init(bus=1)`
+- `GPIO.i2c_scan(bus=1)`
+- `GPIO.i2c_write(bus, addr, data)`
+- `GPIO.i2c_read(bus, addr, length)`
+- `GPIO.i2c_write_reg(bus, addr, reg, data)`
+- `GPIO.i2c_read_reg(bus, addr, reg, length)`
+
+Current route:
+
+- `bus=1` → GPIO 16 = SCL, GPIO 20 = SDA
+
+```python
+GPIO.i2c_init(1)
+print([hex(x) for x in GPIO.i2c_scan(1)])
+```
+
+This route shares pins with PWM on GPIO 16 and GPIO 20.
+
 ### Utility Functions
 
 #### `GPIO.cleanup()`
