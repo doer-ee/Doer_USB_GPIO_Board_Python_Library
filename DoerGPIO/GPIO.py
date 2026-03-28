@@ -79,6 +79,24 @@ def pwm_set_frequency(channel, frequency):
 def adc_read(channel):
   return instance.adc_read(channel)
 
+def i2c_init(bus=1):
+  return instance.i2c_init(bus)
+
+def i2c_scan(bus=1):
+  return instance.i2c_scan(bus)
+
+def i2c_write(bus, addr, data):
+  return instance.i2c_write(bus, addr, data)
+
+def i2c_read(bus, addr, length):
+  return instance.i2c_read(bus, addr, length)
+
+def i2c_write_reg(bus, addr, reg, data):
+  return instance.i2c_write_reg(bus, addr, reg, data)
+
+def i2c_read_reg(bus, addr, reg, length):
+  return instance.i2c_read_reg(bus, addr, reg, length)
+
 def cleanup(number=0):
   instance.cleanup()
 

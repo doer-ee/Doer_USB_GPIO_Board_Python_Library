@@ -242,6 +242,107 @@ class GPIOClient:
     time.sleep(0.01)
     self._write(pinch + "F" + str(frequency) + 'Z')
 
+  def i2c_init(self, bus=1):
+    cmd = f'@{bus}INZ'
+    response = self._write(cmd)
+    try:
+      resp_str = response.decode('UTF-8').strip()
+      if 'ERR' in resp_str:
+        return False
+      return 'OK INIT' in resp_str
+    except Exception as e:
+      error(f"i2c_init failed: {e}")
+      return False
+
+  def i2c_scan(self, bus=1):
+    cmd = f'@{bus}SCZ'
+    response = self._write(cmd)
+    try:
+      resp_str = response.decode('UTF-8').strip()
+      if 'ERR' in resp_str:
+        return []
+      payload = resp_str.split('SCAN')[1].strip()
+      if payload == 'NONE' or payload == '':
+        return []
+      return [int(x, 16) for x in payload.split()]
+    except Exception as e:
+      error(f"i2c_scan failed: {e}")
+      return []
+
+  def i2c_write(self, bus, addr, data):
+    data = bytes(data)
+    addr_hex = f'{addr:02X}'
+    data_hex = data.hex().upper()
+    cmd = f'@{bus}WR{addr_hex},{data_hex}Z'
+    response = self._write(cmd)
+    try:
+      resp_str = response.decode('UTF-8').strip()
+      if 'ERR' in resp_str:
+        raise RuntimeError(f"I2C write error: {resp_str}")
+      return True
+    except RuntimeError:
+      raise
+    except Exception as e:
+      error(f"i2c_write failed: {e}")
+      return False
+
+  def i2c_read(self, bus, addr, length):
+    addr_hex = f'{addr:02X}'
+    len_hex = f'{length:02X}'
+    cmd = f'@{bus}RD{addr_hex},{len_hex}Z'
+    response = self._write(cmd)
+    try:
+      resp_str = response.decode('UTF-8').strip()
+      if 'ERR' in resp_str:
+        raise RuntimeError(f"I2C read error: {resp_str}")
+      payload = resp_str.split('RX')[1].strip()
+      if payload == '':
+        return b''
+      return bytes(int(x, 16) for x in payload.split())
+    except RuntimeError:
+      raise
+    except Exception as e:
+      error(f"i2c_read failed: {e}")
+      return b''
+
+  def i2c_write_reg(self, bus, addr, reg, data):
+    data = bytes(data)
+    addr_hex = f'{addr:02X}'
+    reg_hex = f'{reg:02X}'
+    data_hex = data.hex().upper()
+    cmd = f'@{bus}MW{addr_hex},{reg_hex},{data_hex}Z'
+    response = self._write(cmd)
+    try:
+      resp_str = response.decode('UTF-8').strip()
+      if 'ERR' in resp_str:
+        raise RuntimeError(f"I2C write_reg error: {resp_str}")
+      return True
+    except RuntimeError:
+      raise
+    except Exception as e:
+      error(f"i2c_write_reg failed: {e}")
+      return False
+
+  def i2c_read_reg(self, bus, addr, reg, length):
+    addr_hex = f'{addr:02X}'
+    reg_hex = f'{reg:02X}'
+    len_hex = f'{length:02X}'
+    cmd = f'@{bus}MR{addr_hex},{reg_hex},{len_hex}Z'
+    response = self._write(cmd)
+    try:
+      resp_str = response.decode('UTF-8').strip()
+      if 'ERR' in resp_str:
+        raise RuntimeError(f"I2C read_reg error: {resp_str}")
+      payload = resp_str.split('RX')[1].strip()
+      if payload == '':
+        return b''
+      return bytes(int(x, 16) for x in payload.split())
+    except RuntimeError:
+      raise
+    except Exception as e:
+      error(f"i2c_read_reg failed: {e}")
+      return b''
+
 
   # redirector to wrapped comms link
   def _open(self, *args, **kwargs):
