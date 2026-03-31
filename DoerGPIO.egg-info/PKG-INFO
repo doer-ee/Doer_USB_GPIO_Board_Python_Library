@@ -1,12 +1,11 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: DoerGPIO
-Version: 0.4
+Version: 1.1
 Summary: USB GPIO interface for Python
 Home-page: https://doer.ee
 Author: Pasco Tang
 Author-email: pasco@doer.ee
 License: GPL-3.0-or-later
-Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: Developers
 Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
@@ -16,6 +15,18 @@ Classifier: Operating System :: OS Independent
 Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: pyserial
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
 
 # Doer USB GPIO Board
 
@@ -191,6 +202,28 @@ analog_value = GPIO.adc_read(26)
 voltage = (analog_value / 4095.0) * 3.3  # Convert to voltage
 ```
 
+### I2C Functions
+
+The library exposes bus-level I2C helpers:
+
+- `GPIO.i2c_init(bus=1)`
+- `GPIO.i2c_scan(bus=1)`
+- `GPIO.i2c_write(bus, addr, data)`
+- `GPIO.i2c_read(bus, addr, length)`
+- `GPIO.i2c_write_reg(bus, addr, reg, data)`
+- `GPIO.i2c_read_reg(bus, addr, reg, length)`
+
+Current route:
+
+- `bus=1` → GPIO 16 = SCL, GPIO 20 = SDA
+
+```python
+GPIO.i2c_init(1)
+print([hex(x) for x in GPIO.i2c_scan(1)])
+```
+
+This route shares pins with PWM on GPIO 16 and GPIO 20.
+
 ### Utility Functions
 
 #### `GPIO.cleanup()`
@@ -316,4 +349,3 @@ This program is free software: you can redistribute it and/or modify it under th
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
-

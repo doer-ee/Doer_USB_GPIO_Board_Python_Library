@@ -183,16 +183,20 @@ The library exposes bus-level I2C helpers:
 - `GPIO.i2c_write_reg(bus, addr, reg, data)`
 - `GPIO.i2c_read_reg(bus, addr, reg, length)`
 
-Current route:
+Current routes:
 
 - `bus=1` → GPIO 16 = SCL, GPIO 20 = SDA
+- `bus=2` → GPIO 3 = SCL, GPIO 2 = SDA
 
 ```python
 GPIO.i2c_init(1)
 print([hex(x) for x in GPIO.i2c_scan(1)])
+
+GPIO.i2c_init(2)
+print([hex(x) for x in GPIO.i2c_scan(2)])
 ```
 
-This route shares pins with PWM on GPIO 16 and GPIO 20.
+`bus=1` and `bus=2` are alternate routes for the same hardware I2C peripheral, so only one route is active at a time. `bus=1` shares pins with PWM on GPIO 16 and GPIO 20.
 
 ### Utility Functions
 
