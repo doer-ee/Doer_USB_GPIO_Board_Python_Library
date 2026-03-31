@@ -9,6 +9,7 @@ This is a Python library for controlling Doer USB GPIO boards. This library prov
 - **GPIO Control**: Digital input/output operations with configurable pull-up/pull-down resistors
 - **PWM Support**: Pulse Width Modulation on compatible pins (4, 9, 10, 16, 18, 20, 22, 26)
 - **ADC Readings**: Analog-to-Digital conversion on supported pins (0, 9, 10, 11, 14, 15, 18, 26)
+- **I2C Support**: Bus-level I2C read/write helpers on GPIO 16/20 and GPIO 3/2 routes
 - **Automatic Device Detection**: Automatically detects Doer GPIO boards (USB VID:PID 1a86:7523)
 - **Hardware/Software Version Verification**: Validates board compatibility
 - **Raspberry Pi Compatible API**: Familiar GPIO interface similar to RPi.GPIO
